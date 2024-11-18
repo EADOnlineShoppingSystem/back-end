@@ -18,6 +18,14 @@ const createOder = async (oderData)=>{
 }
 
 const getOdersByUserId =async (userId)=>{
-        
+        try {
+            const orders = await Order.find({ userId: userId });
+        if (!orders.length) {
+            throw new Error("No orders found for the given user ID");
+        }
+        return orders;
+        } catch (error) {
+            throw new Error(`cannot find oders by user,${error.message}`)
+        }
 }
-export default { getAllOrdersServices,createOder };
+export default { getAllOrdersServices,createOder,getOdersByUserId };
