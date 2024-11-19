@@ -1,12 +1,12 @@
 import express from 'express';
-import { createProxyMiddleware } from "http-proxy-middleware";
-
-const apiKeyMiddleware =require('./middlewares/apiKeyMiddleware');
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 3500;
 
 
+app.use(cors());
 app.use((req,res,next)=>{
     console.log(`${req.method} ${req.url}`);
     next();
@@ -17,14 +17,22 @@ app.use(
     "/order",
     createProxyMiddleware({
         target: "http://localhost:5001",
-        changeOrigin: true,})
+        changeOrigin: true,
+        onError: (err, req, res) => {
+        console.error('Order service proxy error:', err.message);
+        res.status(500).send('Order service is unavailable.');
+    }})
 );
 
 app.use(
     "/auth",
     createProxyMiddleware({
         target: "http://localhost:5002",
-        changeOrigin: true,})
+        changeOrigin: true,
+         onError: (err, req, res) => {
+        console.error('Order service proxy error:', err.message);
+        res.status(500).send('Order service is unavailable.');
+    }})
     
 )
 
