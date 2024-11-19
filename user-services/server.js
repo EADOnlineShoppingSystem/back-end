@@ -11,6 +11,10 @@ const app = express();
 
 app.use(express.json()); // <-- This line is essential for parsing JSON
 
+const cors = require('cors');
+app.use(cors()); // Enable CORS for all origins
+
+
 app.use('/api/users', userRoutes); // Mount user routes at /api/users
 
 const PORT = process.env.PORT || 5000;
