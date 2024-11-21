@@ -97,28 +97,28 @@ router.get("/products/:categoryId", async (req, res) => {
   });
 
   // Fetch Product Details by Product ID
-router.get("/product/:productId", async (req, res) => {
-  const { productId } = req.params;
-
-  try {
-    // Validate if the productId is a valid ObjectId
+  router.get("/product/:productId", async (req, res) => {
+    const { productId } = req.params;
+  
+    console.log("Received productId:", productId); // Debug log
+  
     if (!productId.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({ message: "Invalid product ID format." });
     }
-
-    // Find the product by ID and populate its category details
-    const product = await Product.findById(productId).populate("category");
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found." });
+  
+    try {
+      const product = await Product.findById(productId).populate("category");
+      if (!product) {
+        return res.status(404).json({ message: "Product not found." });
+      }
+  
+      res.status(200).json({ product });
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+      res.status(500).json({ message: "Server error." });
     }
-
-    res.status(200).json({ product });
-  } catch (error) {
-    console.error("Error fetching product details:", error);
-    res.status(500).json({ message: "Server error." });
-  }
-});
+  });
+  
 
   
 
