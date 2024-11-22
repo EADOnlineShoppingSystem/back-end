@@ -24,6 +24,18 @@ app.use(
     }})
 );
 
+
+app.use(
+    "/Product",
+    createProxyMiddleware({
+        target: "http://localhost:6000",
+        changeOrigin: true,
+        onError: (err, req, res) => {
+        console.error('Product service proxy error:', err.message);
+        res.status(500).send('product service is unavailable.');
+    }})
+);
+
 app.use(
     "/auth",
     createProxyMiddleware({
