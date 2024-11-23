@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
+  categoryName: {
+    type: String,
     required: true,
   },
   productTitle: {
@@ -32,6 +31,12 @@ const productSchema = new mongoose.Schema({
   },
   warranty: {
     type: String, // e.g., "6 months", "1 year"
+  },
+  storages: {
+    type: [String], // Array of storage options, e.g., ["64GB", "128GB"]
+  },
+  colors: {
+    type: [String], // Array of color options, e.g., ["Red", "Blue"]
   },
   createdAt: {
     type: Date,

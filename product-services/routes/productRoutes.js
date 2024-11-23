@@ -26,29 +26,40 @@ router.post("/add-category", async (req, res) => {
   });
   
 
+
 // Add a new product
 router.post("/add-product", async (req, res) => {
   const { 
-    categoryId, 
+    categoryName, 
     productTitle, 
     productDescription, 
     lowestPrice, 
     largestPrice, 
     quantity, 
     tag, 
-    warranty 
+    warranty, 
+    storages, 
+    colors 
   } = req.body;
 
   try {
-    // Check if the category exists
-    const category = await Category.findById(categoryId);
+    // Optionally: Validate that the category exists in the database
+    const category = await Category.findOne({ name: categoryName });
     if (!category) {
       return res.status(404).json({ message: "Category not found." });
     }
 
+    // Validate storages and colors (if provided)
+    if (storages && !Array.isArray(storages)) {
+      return res.status(400).json({ message: "Storages must be an array." });
+    }
+    if (colors && !Array.isArray(colors)) {
+      return res.status(400).json({ message: "Colors must be an array." });
+    }
+
     // Create a new product
     const product = new Product({
-      category: categoryId,
+      categoryName,
       productTitle,
       productDescription,
       lowestPrice,
@@ -56,6 +67,8 @@ router.post("/add-product", async (req, res) => {
       quantity,
       tag,
       warranty,
+      storages,
+      colors,
     });
 
     // Save the product
@@ -67,6 +80,8 @@ router.post("/add-product", async (req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 });
+
+
 
 //Get all  Category
 router.get("/categories", async (req, res) => {
@@ -80,18 +95,27 @@ router.get("/categories", async (req, res) => {
   });
   
 
+
 // Fetch Products by Category
-router.get("/products/:categoryId", async (req, res) => {
-    const { categoryId } = req.params;
-  
-    try {
-      const products = await Product.find({ category: categoryId }).populate("category");
-      res.status(200).json({ products });
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      res.status(500).json({ message: "Server error." });
+router.get("/getProducts/:categoryName", async (req, res) => {
+  const { categoryName } = req.params;
+
+  try {
+    // Find products by categoryName
+    const products = await Product.find({ categoryName });
+
+    if (!products.length) {
+      return res.status(404).json({ message: "No products found for this category." });
     }
-  });
+
+    res.status(200).json({ products });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+
 
   // Fetch Product Details by Product ID
   router.get("/product/:productId", async (req, res) => {
@@ -115,8 +139,6 @@ router.get("/products/:categoryId", async (req, res) => {
       res.status(500).json({ message: "Server error." });
     }
   });
-  
-
   
 
 module.exports = router;
