@@ -38,7 +38,7 @@ const sendOtpEmail = async (email, otp) => {
 
 // Register Route
 router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { username,email, password } = req.body;
 
   try {
     // Check if user already exists
@@ -56,6 +56,7 @@ router.post("/register", async (req, res) => {
 
     // Save user as unverified
     const newUser = new User({
+      username,
       email,
       password: hashedPassword,
       isVerified: false,
@@ -288,6 +289,26 @@ router.post("/reset-password", async (req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 });
+
+
+// Get User Details by ID
+router.get("/user/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    // Find user by ID
+    const user = await User.findById(userId).select("-password"); // Exclude password from response
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
 
 
 
