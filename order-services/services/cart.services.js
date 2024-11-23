@@ -13,9 +13,9 @@ const getCartByUserId =async(userId)=>{
     }
 }
 
-const addToCart = async (cartData)=>{
+const addToCart = async (cartData,userId)=>{
     try {
-        const newCart =new cart(cartData);
+        const newCart =new cart({...cartData,userId:userId});
         return await newCart.save();
     } catch (error) {
         throw new Error("error creating cart")

@@ -46,9 +46,7 @@ const createOders =async (req,res)=>{
     try {
         const oders = req.body;
         const userID = req.user.id
-        console.log("userID",userID);
         const newOders = await oderServices.createOder(oders,userID);
-        console.log("newOders",newOders);
         res.status(201).json(newOders);
         
     } catch (error) {
