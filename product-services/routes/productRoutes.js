@@ -5,17 +5,9 @@ const Category = require("../models/Category");
 
 // Add a new category
 router.post("/add-category", async (req, res) => {
-    const { name, attributes } = req.body;
+    const { name} = req.body;
   
     try {
-      // Parse `attributes` if it's sent as a JSON string
-      const parsedAttributes = typeof attributes === "string" ? JSON.parse(attributes) : attributes;
-  
-      // Validate the parsed attributes
-      if (!Array.isArray(parsedAttributes) || parsedAttributes.some(attr => !attr.name || !attr.type)) {
-        return res.status(400).json({ message: "Invalid attributes format." });
-      }
-  
       // Check if category already exists
       const existingCategory = await Category.findOne({ name });
       if (existingCategory) {
@@ -23,7 +15,7 @@ router.post("/add-category", async (req, res) => {
       }
   
       // Save the category
-      const category = new Category({ name, attributes: parsedAttributes });
+      const category = new Category({ name});
       await category.save();
   
       res.status(201).json({ message: "Category added successfully.", category });
@@ -36,7 +28,16 @@ router.post("/add-category", async (req, res) => {
 
 // Add a new product
 router.post("/add-product", async (req, res) => {
-  const { categoryId, name, attributes, priceRange, availableStock } = req.body;
+  const { 
+    categoryId, 
+    productTitle, 
+    productDescription, 
+    lowestPrice, 
+    largestPrice, 
+    quantity, 
+    tag, 
+    warranty 
+  } = req.body;
 
   try {
     // Check if the category exists
@@ -45,23 +46,19 @@ router.post("/add-product", async (req, res) => {
       return res.status(404).json({ message: "Category not found." });
     }
 
-    // Validate attributes against category definition
-    const invalidAttributes = attributes && Object.keys(attributes).filter(attr => 
-      !category.attributes.find(catAttr => catAttr.name === attr)
-    );
-
-    if (invalidAttributes?.length) {
-      return res.status(400).json({ message: `Invalid attributes: ${invalidAttributes.join(", ")}` });
-    }
-
     // Create a new product
     const product = new Product({
       category: categoryId,
-      name,
-      attributes,
-      priceRange,
-      availableStock,
+      productTitle,
+      productDescription,
+      lowestPrice,
+      largestPrice,
+      quantity,
+      tag,
+      warranty,
     });
+
+    // Save the product
     await product.save();
 
     res.status(201).json({ message: "Product added successfully.", product });

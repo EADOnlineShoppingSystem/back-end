@@ -6,18 +6,32 @@ const productSchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   },
-  name: {
+  productTitle: {
     type: String,
     required: true,
   },
-  attributes: Object, // e.g., { colors: ["Red", "Blue"], storage: ["64GB", "128GB"] }
-  priceRange: {
-    min: Number,
-    max: Number,
+  productDescription: {
+    type: String,
+    required: true,
   },
-  availableStock: {
+  lowestPrice: {
     type: Number,
+    required: true,
+  },
+  largestPrice: {
+    type: Number,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
     default: 0,
+  },
+  tag: {
+    type: String,
+  },
+  warranty: {
+    type: String, // e.g., "6 months", "1 year"
   },
   createdAt: {
     type: Date,
