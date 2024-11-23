@@ -5,6 +5,6 @@ import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.get("/allOrders", orderController.getAllOrders);
-router.post("/createOrder",oderController.createOders);
+router.post("/createOrder",authMiddleware,oderController.createOders);
 router.get("/getOdersByUserId/:userId",oderController.getOdersByUserId)
 export default router;

@@ -8,16 +8,18 @@ const getAllOrdersServices = async () => {
     }
 };
 
-const createOder = async (oderData)=>{
+const createOder = async (oderData,userId)=>{
     try {
-        const newOder = new Order(oderData);
+        const newOder = new Order({
+            ...oderData,
+            userId:userId});
         console.log("newOder",newOder);
         return await newOder.save();
     } catch (error) {
         throw new Error("error creating order")
     }
-}
 
+}
 const getOdersByUserId =async (userId)=>{
         try {
             const orders = await Order.find({ userId: userId });
