@@ -2,8 +2,8 @@ import cartServices from "../services/cart.services.js"
 const getCartDetailsByUserID = async (req,res)=>{
 
     try {
-        const userID =req.params.userID
-        const getCarts = await  cartServices.getCartByUserId(userID)
+        const userID =req.params.userId
+        const getCarts = await  cartServices.getCartByUserId(userId)
         res.status(200).json(getCarts)
     } catch (error) {
        res.status(500).json({ message: error.message });
@@ -19,4 +19,14 @@ const addToCart = async (req,res)=>{
         res.status(500).json({message:error.message})
     }
 }
-export default {addToCart,getCartDetailsByUserID}
+
+const deleteCart = async (req,res)=>{
+    try {
+        const cartId = req.params.id
+        const deleteCart = await cartServices.deleteCart(cartId)
+        res.status(200).json(deleteCart)
+    } catch (error) {
+        res.status(500).json({message:error.message})
+    }
+}
+export default {addToCart,getCartDetailsByUserID,deleteCart}

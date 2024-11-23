@@ -12,17 +12,21 @@ app.use((req,res,next)=>{
     next();
 });
 
-
 app.use(
     "/order",
     createProxyMiddleware({
         target: "http://localhost:5001",
         changeOrigin: true,
+        pathRewrite: {
+            "^/order": "", // Remove the /order prefix when forwarding
+        },
         onError: (err, req, res) => {
-        console.error('Order service proxy error:', err.message);
-        res.status(500).send('Order service is unavailable.');
-    }})
+            console.error('Order service proxy error:', err.message);
+            res.status(500).send('Order service is unavailable.');
+        }
+    })
 );
+
 
 
 app.use(
@@ -37,9 +41,9 @@ app.use(
 );
 
 app.use(
-    "/auth",
+    "/User",
     createProxyMiddleware({
-        target: "http://localhost:5002",
+        target: "http://localhost:5000",
         changeOrigin: true,
          onError: (err, req, res) => {
         console.error('Order service proxy error:', err.message);

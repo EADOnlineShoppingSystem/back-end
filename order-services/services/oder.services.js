@@ -11,6 +11,7 @@ const getAllOrdersServices = async () => {
 const createOder = async (oderData)=>{
     try {
         const newOder = new Order(oderData);
+        console.log("newOder",newOder);
         return await newOder.save();
     } catch (error) {
         throw new Error("error creating order")

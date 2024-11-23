@@ -21,4 +21,11 @@ const addToCart = async (cartData)=>{
         throw new Error("error creating cart")
     }
 }
-export default {addToCart,getCartByUserId}
+const deleteCart = async (cartId)=>{
+    try {
+        return await cart.findByIdAndDelete(cartId)
+    } catch (error) {
+        throw new Error("error deleting cart")
+    }
+}
+export default {addToCart,getCartByUserId,deleteCart}
