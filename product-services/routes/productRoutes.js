@@ -139,6 +139,76 @@ router.get("/getProducts/:categoryName", async (req, res) => {
       res.status(500).json({ message: "Server error." });
     }
   });
+
+
+  // Update Product Details
+router.put("/update-product/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const {
+    categoryName,
+    productTitle,
+    productDescription,
+    lowestPrice,
+    largestPrice,
+    quantity,
+    tag,
+    warranty,
+    storages,
+    colors,
+  } = req.body;
+
+  try {
+    // Validate productId format
+    if (!productId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ message: "Invalid product ID format." });
+    }
+
+    // Find the product
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // Optional: Validate categoryName if it is updated
+    if (categoryName) {
+      const category = await Category.findOne({ name: categoryName });
+      if (!category) {
+        return res.status(404).json({ message: "Category not found." });
+      }
+      product.categoryName = categoryName;
+    }
+
+    // Update product details
+    if (productTitle) product.productTitle = productTitle;
+    if (productDescription) product.productDescription = productDescription;
+    if (lowestPrice) product.lowestPrice = lowestPrice;
+    if (largestPrice) product.largestPrice = largestPrice;
+    if (quantity) product.quantity = quantity;
+    if (tag) product.tag = tag;
+    if (warranty) product.warranty = warranty;
+    if (storages) {
+      if (!Array.isArray(storages)) {
+        return res.status(400).json({ message: "Storages must be an array." });
+      }
+      product.storages = storages;
+    }
+    if (colors) {
+      if (!Array.isArray(colors)) {
+        return res.status(400).json({ message: "Colors must be an array." });
+      }
+      product.colors = colors;
+    }
+
+    // Save updated product
+    await product.save();
+
+    res.status(200).json({ message: "Product updated successfully.", product });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
   
 
 module.exports = router;
