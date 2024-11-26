@@ -5,7 +5,7 @@ const userEmailVerificationModel = require("../models/userEmailVerificationModel
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-
+const axios = require("axios");
 // Email Transporter Configuration
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -38,7 +38,7 @@ const sendOtpEmail = async (email, otp) => {
 
 // Register Route
 router.post("/register", async (req, res) => {
-  const { username,email, password } = req.body;
+  const {email, password } = req.body;
 
   try {
     // Check if user already exists
@@ -56,7 +56,6 @@ router.post("/register", async (req, res) => {
 
     // Save user as unverified
     const newUser = new User({
-      username,
       email,
       password: hashedPassword,
       isVerified: false,
@@ -153,7 +152,11 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if user exists
+    // Check if user exists'
+
+// const orderData = await axios.get("http://localhost:5001/api/orders/allOrders");
+// console.log("Order data:", orderData.data); 
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User does not exist." });

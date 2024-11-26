@@ -1,15 +1,17 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import oderRoutes from "./routes/oder.route.js";
-
+import oderRoutes from "./routes/oder.routes.js";
+import cartRouter from "./routes/cart.routes.js";
+import cors from 'cors'
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 app.use(express.json());
+app.use(cors());
 app.use("/api/orders", oderRoutes);
-
+app.use("/api/cart",cartRouter)
 app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);
 });
