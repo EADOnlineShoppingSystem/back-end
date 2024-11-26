@@ -4,31 +4,7 @@ const upload = require("../middleware/multerConfig");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 
-// Add a new category
-router.post("/add-category", async (req, res) => {
-    const { name} = req.body;
-  
-    try {
-      // Check if category already exists
-      const existingCategory = await Category.findOne({ name });
-      if (existingCategory) {
-        return res.status(400).json({ message: "Category already exists." });
-      }
-  
-      // Save the category
-      const category = new Category({ name});
-      await category.save();
-  
-      res.status(201).json({ message: "Category added successfully.", category });
-    } catch (error) {
-      console.error("Error adding category:", error);
-      res.status(500).json({ message: "Server error." });
-    }
-  });
-  
-
-
-// Add Product with Image Upload
+// Add category
 router.post("/add-category", async (req, res) => {
   const { name } = req.body;
 
@@ -48,7 +24,10 @@ router.post("/add-category", async (req, res) => {
 });
 
 // Add a new product
-router.post("/add-product", upload.array("images", 10), async (req, res) => {
+router.post("/add-product",  async (req, res) => {
+console.log(req.body);
+console.log(req.files);
+
   const {
     categoryName,
     productTitle,
@@ -68,10 +47,10 @@ router.post("/add-product", upload.array("images", 10), async (req, res) => {
       return res.status(404).json({ message: "Category not found." });
     }
 
-    const imageUrls = req.files.map((file) => ({
-      url: file.path,
-      public_id: file.filename,
-    }));
+    // const imageUrls = req.files.map((file) => ({
+    //   url: file.path,
+    //   public_id: file.filename,
+    // }));
 
     const product = new Product({
       categoryName,
@@ -84,7 +63,7 @@ router.post("/add-product", upload.array("images", 10), async (req, res) => {
       warranty,
       storages,
       colors,
-      images: imageUrls,
+      // images: imageUrls,
     });
 
     await product.save();

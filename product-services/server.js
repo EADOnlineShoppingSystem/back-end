@@ -11,10 +11,14 @@ const app = express();
 
 app.use(express.json()); // Middleware for parsing JSON
 
+const cors = require('cors');
+app.use(cors()); // Enable CORS for all origins
+
+
 // Mount product routes
 app.use('/api/products', productRoutes);
 
-const PORT = process.env.PRODUCT_SERVICE_PORT || 6000; // Use a different port for product-services
+const PORT = process.env.PRODUCT_SERVICE_PORT || 5000; // Use a different port for product-services
 
 app.listen(PORT, () => {
   console.log(`Product Service running on http://localhost:${PORT}`);
