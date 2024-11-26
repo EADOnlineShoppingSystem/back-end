@@ -1,63 +1,57 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../middleware/multerConfig");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 
-// Add a new category
+// Add category
 router.post("/add-category", async (req, res) => {
-    const { name} = req.body;
-  
-    try {
-      // Check if category already exists
-      const existingCategory = await Category.findOne({ name });
-      if (existingCategory) {
-        return res.status(400).json({ message: "Category already exists." });
-      }
-  
-      // Save the category
-      const category = new Category({ name});
-      await category.save();
-  
-      res.status(201).json({ message: "Category added successfully.", category });
-    } catch (error) {
-      console.error("Error adding category:", error);
-      res.status(500).json({ message: "Server error." });
-    }
-  });
-  
+  const { name } = req.body;
 
+  try {
+    const existingCategory = await Category.findOne({ name });
+    if (existingCategory) {
+      return res.status(400).json({ message: "Category already exists." });
+    }
+
+    const category = new Category({ name });
+    await category.save();
+
+    res.status(201).json({ message: "Category added successfully.", category });
+  } catch (error) {
+    res.status(500).json({ message: "Server error." });
+  }
+});
 
 // Add a new product
-router.post("/add-product", async (req, res) => {
-  const { 
-    categoryName, 
-    productTitle, 
-    productDescription, 
-    lowestPrice, 
-    largestPrice, 
-    quantity, 
-    tag, 
-    warranty, 
-    storages, 
-    colors 
+router.post("/add-product",upload.array("images", 10),  async (req, res) => {
+console.log(req.body);
+console.log(req.files);
+
+  const {
+    categoryName,
+    productTitle,
+    productDescription,
+    lowestPrice,
+    largestPrice,
+    quantity,
+    tag,
+    warranty,
+    storages,
+    colors,
   } = req.body;
 
   try {
-    // Optionally: Validate that the category exists in the database
     const category = await Category.findOne({ name: categoryName });
     if (!category) {
       return res.status(404).json({ message: "Category not found." });
     }
 
-    // Validate storages and colors (if provided)
-    if (storages && !Array.isArray(storages)) {
-      return res.status(400).json({ message: "Storages must be an array." });
-    }
-    if (colors && !Array.isArray(colors)) {
-      return res.status(400).json({ message: "Colors must be an array." });
-    }
+    const imageUrls = req.files.map((file) => ({
+      url: file.path,
+      public_id: file.filename,
+    }));
 
-    // Create a new product
     const product = new Product({
       categoryName,
       productTitle,
@@ -69,18 +63,16 @@ router.post("/add-product", async (req, res) => {
       warranty,
       storages,
       colors,
+      images: imageUrls,
     });
 
-    // Save the product
     await product.save();
 
     res.status(201).json({ message: "Product added successfully.", product });
   } catch (error) {
-    console.error("Error adding product:", error);
     res.status(500).json({ message: "Server error." });
   }
 });
-
 
 
 //Get all  Category
@@ -139,6 +131,76 @@ router.get("/getProducts/:categoryName", async (req, res) => {
       res.status(500).json({ message: "Server error." });
     }
   });
+
+
+  // Update Product Details
+router.put("/update-product/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const {
+    categoryName,
+    productTitle,
+    productDescription,
+    lowestPrice,
+    largestPrice,
+    quantity,
+    tag,
+    warranty,
+    storages,
+    colors,
+  } = req.body;
+
+  try {
+    // Validate productId format
+    if (!productId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ message: "Invalid product ID format." });
+    }
+
+    // Find the product
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // Optional: Validate categoryName if it is updated
+    if (categoryName) {
+      const category = await Category.findOne({ name: categoryName });
+      if (!category) {
+        return res.status(404).json({ message: "Category not found." });
+      }
+      product.categoryName = categoryName;
+    }
+
+    // Update product details
+    if (productTitle) product.productTitle = productTitle;
+    if (productDescription) product.productDescription = productDescription;
+    if (lowestPrice) product.lowestPrice = lowestPrice;
+    if (largestPrice) product.largestPrice = largestPrice;
+    if (quantity) product.quantity = quantity;
+    if (tag) product.tag = tag;
+    if (warranty) product.warranty = warranty;
+    if (storages) {
+      if (!Array.isArray(storages)) {
+        return res.status(400).json({ message: "Storages must be an array." });
+      }
+      product.storages = storages;
+    }
+    if (colors) {
+      if (!Array.isArray(colors)) {
+        return res.status(400).json({ message: "Colors must be an array." });
+      }
+      product.colors = colors;
+    }
+
+    // Save updated product
+    await product.save();
+
+    res.status(200).json({ message: "Product updated successfully.", product });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
   
 
 module.exports = router;
