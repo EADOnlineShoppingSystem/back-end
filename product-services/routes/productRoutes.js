@@ -132,6 +132,25 @@ router.get("/getProducts/:categoryName", async (req, res) => {
     }
   });
 
+  //get all products
+  // Get all products
+router.get("/all-products", async (req, res) => {
+  try {
+    // Fetch all products from the database
+    const products = await Product.find();
+
+    if (!products.length) {
+      return res.status(404).json({ message: "No products found." });
+    }
+
+    res.status(200).json({ products });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+
 
   // Update Product Details
 router.put("/update-product/:productId", async (req, res) => {
