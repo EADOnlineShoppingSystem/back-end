@@ -24,7 +24,7 @@ router.post("/add-category", async (req, res) => {
 });
 
 // Add a new product
-router.post("/add-product",  async (req, res) => {
+router.post("/add-product",upload.array("images", 10),  async (req, res) => {
 console.log(req.body);
 console.log(req.files);
 
@@ -47,10 +47,10 @@ console.log(req.files);
       return res.status(404).json({ message: "Category not found." });
     }
 
-    // const imageUrls = req.files.map((file) => ({
-    //   url: file.path,
-    //   public_id: file.filename,
-    // }));
+    const imageUrls = req.files.map((file) => ({
+      url: file.path,
+      public_id: file.filename,
+    }));
 
     const product = new Product({
       categoryName,
@@ -63,7 +63,7 @@ console.log(req.files);
       warranty,
       storages,
       colors,
-      // images: imageUrls,
+      images: imageUrls,
     });
 
     await product.save();

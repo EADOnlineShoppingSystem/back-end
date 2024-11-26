@@ -11,12 +11,12 @@ const productSchema = new mongoose.Schema({
   warranty: { type: String },
   storages: { type: [String] },
   colors: { type: [String] },
-  // images: [
-  //   {
-  //     url: { type: String, required: true },
-  //     public_id: { type: String, required: true },
-  //   },
-  // ], // Array of image URLs and public IDs
+  images: [
+    {
+      url: { type: String, required: true },
+      public_id: { type: String, required: true },
+    },
+  ], // Array of image URLs and public IDs
   createdAt: { type: Date, default: Date.now },
 });
 
