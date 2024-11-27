@@ -133,7 +133,6 @@ router.get("/getProducts/:categoryName", async (req, res) => {
   });
 
   //get all products
-  // Get all products
 router.get("/all-products", async (req, res) => {
   try {
     // Fetch all products from the database
