@@ -9,4 +9,6 @@ router.post("/createOrder",authMiddleware,oderController.createOders);
 router.get("/getOdersByUserId/:userId",oderController.getOdersByUserId);
 router.post("/setAddress",authMiddleware,oderController.createAddress);
 router.get("/getAddressById",authMiddleware,oderController.getAddressById);
+//delete address by addressId
+router.delete("/deleteAddress/:addressId",oderController.deleteAddressByUserId)
 export default router;

@@ -46,6 +46,7 @@ const setAddress = async (userId, address) => {
     const getAddressById =async (userId)=>{
         try {
             const address = await Address.find({userId:userId});
+            console.log("address",address);
             return address;
 
         } catch (error) {
@@ -59,5 +60,24 @@ const setAddress = async (userId, address) => {
             throw new Error("Error while fetching address count");
         }
     }
+    const deleteAddressByUserId =async(AddressId)=>{
+        try {
+            return await Address.deleteOne({ _id: AddressId });
+        } catch (error) {
+            throw new Error("error deleting address")
+        }
+    }
+   const getAlllOdersAmountQuantitygivenMonthToToday = async () => {
+    try {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        console.log("currentMonth",now);
+        console.log("orders",currentMonth);
 
-export default { getAllOrdersServices,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId }
+        return result;
+    } catch (error) {
+        throw new Error(`Error calculating order summaries: ${error.message}`);
+    }
+};
+
+export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,getAlllOdersAmountQuantitygivenMonthToToday }
