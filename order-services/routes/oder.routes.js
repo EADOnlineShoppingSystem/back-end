@@ -11,4 +11,5 @@ router.post("/setAddress",authMiddleware,oderController.createAddress);
 router.get("/getAddressById",authMiddleware,oderController.getAddressById);
 //delete address by addressId
 router.delete("/deleteAddress/:addressId",oderController.deleteAddressByUserId)
+router.get("/getAmountLastMonth",oderController.getAmountsAndCountsForMonth)
 export default router;

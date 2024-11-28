@@ -67,17 +67,40 @@ const setAddress = async (userId, address) => {
             throw new Error("error deleting address")
         }
     }
-   const getAlllOdersAmountQuantitygivenMonthToToday = async () => {
+const getAllOrdersAmountQuantityGivenMonthToToday = async () => {
     try {
         const now = new Date();
-        const currentMonth = now.getMonth();
-        console.log("currentMonth",now);
-        console.log("orders",currentMonth);
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); 
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59); 
+        
+        const orders = await Order.find({
+            createdAt: {
+                $gte: startOfMonth,
+                $lte: endOfToday,
+            },
+        });
+        // Calculate the total amount and quantity
+        const summary = orders.reduce(
+            (acc, order) => {
+                acc.totalAmount += order.price || 0; 
+                acc.totalQuantity += order.quantity || 0;
+                return acc;
+            },
+            { totalAmount: 0, totalQuantity: 0 }
+        );
 
-        return result;
+        console.log("Current Month:", now.getMonth() + 1);
+        console.log("Order Summary:", summary);
+
+        const allReturnData={
+            ...summary,
+            month: now.getMonth() + 1,
+        }
+        return allReturnData;
     } catch (error) {
         throw new Error(`Error calculating order summaries: ${error.message}`);
     }
 };
 
-export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,getAlllOdersAmountQuantitygivenMonthToToday }
+
+export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,getAllOrdersAmountQuantityGivenMonthToToday }
