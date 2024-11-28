@@ -1,7 +1,7 @@
 import oderServices from "../services/oder.services.js";
 import axios from "axios";
 
-
+//get All Orders 
 const getAllOrders = async (req, res) => {
     try {
         const orders = await oderServices.getAllOrdersServices();
@@ -41,7 +41,7 @@ const getAllOrders = async (req, res) => {
     }
 };
 
-
+//create Oders
 const createOders =async (req,res)=>{
     try {
         const oders = req.body;
@@ -54,7 +54,7 @@ const createOders =async (req,res)=>{
         
     }
 }
-
+//get Oders By User Id
 const getOdersByUserId = async (req, res) => {
     try {
         const userId = req.params.userId;
@@ -83,6 +83,35 @@ const getOdersByUserId = async (req, res) => {
     }
 };
 
+const createAddress =async (req,res)=>{
+    try {
+        const userID =req.user.id;
+        const address = req.body;
+        const addressCount = await oderServices.getAddressCountByUserId(userID);
+        if (addressCount <2) {
+             const newAddress = await oderServices.setAddress(userID,address)
+             res.status(201).json(newAddress);
+        }
+        else{
+            res.status(400).json({message:"You can not add more than 2 address"});
+        }
+      
+}
+    catch (error) {
+        console.log("error in createAddress",error.message);
+        res.status(500).json({message:error.message});
+    }
+}
+const getAddressById =async (req,res)=>{
+    try{
+        const userID = req.user.id;
+        console.log("userID",userID);
+        const address= await oderServices.getAddressById(userID)
+        res.status(200).json(address);
 
+    }catch(error){
+        console.log("error in getAddressById",error.message);
+        res.status(500).json({message:error.message});
+}}
 
-export default { getAllOrders,createOders,getOdersByUserId};
+export default { getAllOrders,createOders,getOdersByUserId,createAddress,getAddressById };

@@ -4,7 +4,7 @@ const getCartDetailsByUserID = async (req, res) => {
     try {
         const userID = req.user.id;
         const getCarts = await cartServices.getCartByUserId(userID);
-console.log("getCarts",getCarts);
+        console.log("getCarts",getCarts);
         if (!getCarts || getCarts.length === 0) {
             return res.status(404).json({ message: "No carts found for this user." });
         }
@@ -12,7 +12,7 @@ console.log("getCarts",getCarts);
         const cartDetailsPromise = getCarts.map(async (cart) => {
             try {
                 console.log("cart",cart.productId);
-                 const productDetails = await axios.get(`http://localhost:3500/Product/api/products/product/674195cbc36bd2ccee6e1205`);
+                 const productDetails = await axios.get(`http://localhost:3500/Product/api/products/product/${cart.productId}`);
 
                 return {
                     ...cart.toObject(),
@@ -38,6 +38,7 @@ console.log("getCarts",getCarts);
 
 const addToCart = async (req,res)=>{
     try {
+        console.log("req.body",req.user.id);
         const cartData = req.body
         const userId = req.user.id
         const addCart = await cartServices.addToCart(cartData,userId)

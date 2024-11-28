@@ -1,4 +1,5 @@
 import Order from '../models/oderModel.js'
+import Address from "../models/address.js"
 
 const getAllOrdersServices = async () => {
     try {
@@ -13,7 +14,6 @@ const createOder = async (oderData,userId)=>{
         const newOder = new Order({
             ...oderData,
             userId:userId});
-        console.log("newOder",newOder);
         return await newOder.save();
     } catch (error) {
         throw new Error("error creating order")
@@ -31,4 +31,33 @@ const getOdersByUserId =async (userId)=>{
             throw new Error(`cannot find oders by user,${error.message}`)
         }
 }
-export default { getAllOrdersServices,createOder,getOdersByUserId };
+const setAddress = async (userId, address) => {
+    try {
+        const newAddress = new Address({
+            ...address,
+            userId:userId});
+            console.log("newAddress",newAddress);
+        return await newAddress.save();
+    } catch (error) {
+        throw new Error("error creating Address")
+    }
+    }
+
+    const getAddressById =async (userId)=>{
+        try {
+            const address = await Address.find({userId:userId});
+            return address;
+
+        } catch (error) {
+             throw new Error("error Fletchng Address")
+        }
+    }
+    const getAddressCountByUserId = async (userId) => {
+        try {
+            return await Address.find({ userId: userId }).countDocuments();
+        } catch (error) {
+            throw new Error("Error while fetching address count");
+        }
+    }
+
+export default { getAllOrdersServices,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId }
