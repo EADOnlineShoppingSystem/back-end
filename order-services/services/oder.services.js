@@ -102,5 +102,53 @@ const getAllOrdersAmountQuantityGivenMonthToToday = async () => {
     }
 };
 
+const getLastTenDaysOrdersCount = async () => {
+    try {
+        const now = new Date();
+        const lastTenDays = [];
 
-export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,getAllOrdersAmountQuantityGivenMonthToToday }
+        // Loop through the last 10 days
+        for (let i = 0; i < 10; i++) {
+            const startOfDay = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - i,
+                0,
+                0,
+                0
+            );
+            const endOfDay = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - i,
+                23,
+                59,
+                59
+            );
+
+            // Fetch order count for the specific day
+            const orderCount = await Order.find({
+                createdAt: {
+                    $gte: startOfDay,
+                    $lte: endOfDay,
+                },
+            }).countDocuments();
+
+            // Add the data for the day to the results
+            lastTenDays.push({
+                day: `Day ${10 - i}`, 
+                date: startOfDay.toISOString().split('T')[0],
+                orders: orderCount,
+            });
+        }
+
+        return lastTenDays.reverse(); // Reverse to have Day 1 as the latest day
+    } catch (error) {
+        throw new Error(`Error fetching order counts: ${error.message}`);
+    }
+};
+
+
+
+
+export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,getAllOrdersAmountQuantityGivenMonthToToday ,getLastTenDaysOrdersCount}

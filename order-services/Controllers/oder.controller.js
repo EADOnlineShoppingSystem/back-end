@@ -131,11 +131,19 @@ const deleteAddressByUserId =async (req,res)=>{
 
 const getAmountsAndCountsForMonth = async (req, res) => {
     try {
-        const Amounts= await oderServices.getAllOrdersAmountQuantityGivenMonthToToday();
+        const Amounts= await oderServices.getLastTenDaysOrdersCount();
         res.status(200).json(Amounts);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
 
-export default { getAllOrders,createOders,getOdersByUserId,createAddress,deleteAddressByUserId,getAddressById,getAmountsAndCountsForMonth };
+const getOdersCountLast10Days = async (req, res) => {
+    try {
+        const Amounts= await oderServices.getLastTenDaysOrdersCount();
+        res.status(200).json(Amounts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+export default { getAllOrders,createOders,getOdersByUserId,createAddress,deleteAddressByUserId,getAddressById,getOdersCountLast10Days,getAmountsAndCountsForMonth };
