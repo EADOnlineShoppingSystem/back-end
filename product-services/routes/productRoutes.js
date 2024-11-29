@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../middleware/multerConfig");
+const cloudinary = require("../config/cloudinaryConfig");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 
-// Add category
 // Add category with image upload
 router.post("/add-category", upload.single("image"), async (req, res) => {
   const { name } = req.body;
@@ -36,40 +36,33 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
   }
 });
 
-// Edit category with image upload
-router.put("/update-category/:categoryId", upload.single("image"), async (req, res) => {
+
+// Delete category and all associated products
+router.delete("/delete-category/:categoryId", async (req, res) => {
   const { categoryId } = req.params;
-  const { name } = req.body;
 
   try {
+    // Find the category by ID
     const category = await Category.findById(categoryId);
     if (!category) {
       return res.status(404).json({ message: "Category not found." });
     }
 
-    // Update the name if provided
-    if (name) {
-      category.name = name;
+    // Delete all products associated with this category
+    await Product.deleteMany({ categoryName: category.name });
+
+    // Optionally, delete the category image from Cloudinary if it exists
+    if (category.image?.public_id) {
+      console.log("Deleting image from Cloudinary...");
+      await cloudinary.uploader.destroy(category.image.public_id);
     }
 
-    // Update the image if a new one is uploaded
-    if (req.file) {
-      // Optionally delete the old image from Cloudinary
-      if (category.image?.public_id) {
-        await cloudinary.uploader.destroy(category.image.public_id);
-      }
+    // Use `findByIdAndDelete` to delete the category
+    await Category.findByIdAndDelete(categoryId);
 
-      // Add the new image
-      category.image = {
-        url: req.file.path,
-        public_id: req.file.filename,
-      };
-    }
-
-    await category.save();
-    res.status(200).json({ message: "Category updated successfully.", category });
+    res.status(200).json({ message: "Category and all associated products deleted successfully." });
   } catch (error) {
-    console.error("Error updating category:", error);
+    console.error("Error deleting category:", error);
     res.status(500).json({ message: "Server error." });
   }
 });
@@ -125,7 +118,7 @@ console.log(req.files);
     res.status(500).json({ message: "Server error." });
   }
 });
-
+ 
 
 //Get all  Category
 router.get("/categories", async (req, res) => {
@@ -138,7 +131,6 @@ router.get("/categories", async (req, res) => {
     }
   });
   
-
 
 // Fetch Products by Category
 router.get("/getProducts/:categoryName", async (req, res) => {
@@ -160,7 +152,7 @@ router.get("/getProducts/:categoryName", async (req, res) => {
 });
 
 
-
+//get product by Id
 router.get("/product/:productId", async (req, res) => {
   const { productId } = req.params;
 
@@ -191,6 +183,38 @@ router.get("/product/:productId", async (req, res) => {
   }
 });
 
+// Route to delete product
+router.delete("/delete-product/:productId", async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+    // Find the product by ID
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    // Delete images from Cloudinary if the product has any
+    if (product.images && product.images.length > 0) {
+      // Loop through all images if the product has multiple images
+      for (let image of product.images) {
+        if (image.public_id) {
+          console.log(`Deleting image with public_id: ${image.public_id}`);
+          // Destroy image from Cloudinary
+          await cloudinary.uploader.destroy(image.public_id);
+        }
+      }
+    }
+
+    // Delete the product from the database
+    await Product.findByIdAndDelete(productId);
+
+    res.status(200).json({ message: "Product deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
 
 
   //get all products
@@ -211,9 +235,8 @@ router.get("/all-products", async (req, res) => {
 });
 
 
-
-  // Update Product Details
-router.put("/update-product/:productId", async (req, res) => {
+// Update Product Details (only update provided fields)
+router.put("/update-product/:productId", upload.array("images", 10), async (req, res) => {
   const { productId } = req.params;
   const {
     categoryName,
@@ -228,57 +251,66 @@ router.put("/update-product/:productId", async (req, res) => {
     colors,
   } = req.body;
 
+  // Create an object to hold the fields to update
+  const updateFields = {};
+
+  // Check if each field is provided and only update those fields
+  if (categoryName) updateFields.categoryName = categoryName;
+  if (productTitle) updateFields.productTitle = productTitle;
+  if (productDescription) updateFields.productDescription = productDescription;
+  if (lowestPrice) updateFields.lowestPrice = lowestPrice;
+  if (largestPrice) updateFields.largestPrice = largestPrice;
+  if (quantity) updateFields.quantity = quantity;
+  if (tag) updateFields.tag = tag;
+  if (warranty) updateFields.warranty = warranty;
+  if (storages) {
+    if (Array.isArray(storages)) {
+      updateFields.storages = storages;
+    } else {
+      return res.status(400).json({ message: "Storages must be an array." });
+    }
+  }
+  if (colors) {
+    if (Array.isArray(colors)) {
+      updateFields.colors = colors;
+    } else {
+      return res.status(400).json({ message: "Colors must be an array." });
+    }
+  }
+
+  // If new images are uploaded, add those as well
+  if (req.files && req.files.length > 0) {
+    const imageUrls = req.files.map((file) => ({
+      url: file.path,
+      public_id: file.filename,
+    }));
+    updateFields.images = imageUrls;
+  }
+
   try {
     // Validate productId format
     if (!productId.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({ message: "Invalid product ID format." });
     }
 
-    // Find the product
-    const product = await Product.findById(productId);
-    if (!product) {
+    // Find the product by ID and update only the specified fields
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      { $set: updateFields }, // Use $set to update only the specified fields
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedProduct) {
       return res.status(404).json({ message: "Product not found." });
     }
 
-    // Optional: Validate categoryName if it is updated
-    if (categoryName) {
-      const category = await Category.findOne({ name: categoryName });
-      if (!category) {
-        return res.status(404).json({ message: "Category not found." });
-      }
-      product.categoryName = categoryName;
-    }
-
-    // Update product details
-    if (productTitle) product.productTitle = productTitle;
-    if (productDescription) product.productDescription = productDescription;
-    if (lowestPrice) product.lowestPrice = lowestPrice;
-    if (largestPrice) product.largestPrice = largestPrice;
-    if (quantity) product.quantity = quantity;
-    if (tag) product.tag = tag;
-    if (warranty) product.warranty = warranty;
-    if (storages) {
-      if (!Array.isArray(storages)) {
-        return res.status(400).json({ message: "Storages must be an array." });
-      }
-      product.storages = storages;
-    }
-    if (colors) {
-      if (!Array.isArray(colors)) {
-        return res.status(400).json({ message: "Colors must be an array." });
-      }
-      product.colors = colors;
-    }
-
-    // Save updated product
-    await product.save();
-
-    res.status(200).json({ message: "Product updated successfully.", product });
+    res.status(200).json({ message: "Product updated successfully.", product: updatedProduct });
   } catch (error) {
     console.error("Error updating product:", error);
     res.status(500).json({ message: "Server error." });
   }
 });
+
 
   
 
