@@ -6,7 +6,7 @@ const address = new Schema({
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    zip: { type: Number, required: true },
+    zip: { type: String, required: true },
     phone: { type: String, required: true },
     isDefault:{type:Boolean,default:false},
     isProfessional:{type:Boolean,default:false}
