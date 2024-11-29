@@ -78,4 +78,14 @@ const getAllQuantityByUsers = async (req,res)=>{
         res.status(500).json({message:error.message})
     }
 }
-export default {addToCart,getCartDetailsByUserID,deleteCart,getAllQuantityByUsers}
+const updateCartQuantity = async (req,res)=>{
+    try {
+        const data = req.body;
+        const update = await cartServices.updateCartQuantity(data._id,data.quantity);
+        res.status(200).json(update);
+        
+    } catch (error) {
+        res.status(500).json({message:error.message})
+    }
+}
+export default {addToCart,getCartDetailsByUserID,deleteCart,getAllQuantityByUsers,updateCartQuantity}

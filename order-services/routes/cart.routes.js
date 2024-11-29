@@ -8,4 +8,5 @@ cartRouter.get("/getCartsByuser",authMiddleware,cartController.getCartDetailsByU
 cartRouter.post("/addtocart",authMiddleware,cartController.addToCart);
 cartRouter.delete("/deleteCart/:id",cartController.deleteCart);
 cartRouter.get("/getAllQuantityByUsers",authMiddleware,cartController.getAllQuantityByUsers);
+cartRouter.put("/UpdateCartQantity",authMiddleware,cartController.updateCartQuantity);
 export default cartRouter
