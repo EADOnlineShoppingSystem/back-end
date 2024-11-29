@@ -12,20 +12,22 @@ const getAllOrders = async (req, res) => {
 
         const detailedOrdersPromises = orders.map(async (order) => {
             try {
-            console.log("order",order.userId);
-               const productDetails = await axios.get(`http://localhost:3500/Product/api/products/product/${order.productId}`);
+                console.log("order", order.userId);
+
+                const productDetails = await axios.get(`http://localhost:3500/Product/api/products/product/${order.productId}`);
                 const userDetails = await axios.get(`http://localhost:3500/User/api/users/user/${order.userId}`);
-             console.log("productDetails",userDetails);
+                
+                console.log("productDetails", userDetails);
 
                 return {
-                    ...order.toObject(),
+                    ...order, // Use spread operator without toObject() if `order` is already a plain object
                     productDetails: productDetails.data,
-                     userDetails: userDetails.data,
+                    userDetails: userDetails.data,
                 };
             } catch (error) {
                 console.error(`Error fetching details for order ID ${order._id}:`, error.message);
                 return {
-                    ...order.toObject(),
+                    ...order, // Return the order even if the details are not found
                     productDetails: null,
                     userDetails: null,
                 };
@@ -40,6 +42,7 @@ const getAllOrders = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 //create Oders
 const createOders =async (req,res)=>{
