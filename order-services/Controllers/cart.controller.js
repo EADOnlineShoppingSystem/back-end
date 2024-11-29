@@ -36,17 +36,29 @@ const getCartDetailsByUserID = async (req, res) => {
 };
 
 
-const addToCart = async (req,res)=>{
+const addToCart = async (req, res) => {
     try {
-        console.log("req.body",req.user.id);
-        const cartData = req.body
-        const userId = req.user.id
-        const addCart = await cartServices.addToCart(cartData,userId)
-        res.status(201).json(addCart)
+        const cartData = req.body;
+        const userId = req.user.id;
+        console.log("cartData",cartData.productId);
+        console.log("userId",userId);
+        const existingCart = await cartServices.findCartByUserIdAndProductId(userId, cartData.productId);
+
+        if (existingCart) {
+            const newQuantity = existingCart.quantity + cartData.quantity;
+            const updatedCart = await cartServices.updateCartQuantity(existingCart._id, newQuantity);
+            return res.status(200).json(updatedCart);
+        }
+
+    const addCart = await cartServices.addToCart(cartData, userId);
+
+
+        
+        res.status(201).json(addCart);
     } catch (error) {
-        res.status(500).json({message:error.message})
+        res.status(500).json({ message: error.message });
     }
-}
+};
 
 const deleteCart = async (req,res)=>{
     try {

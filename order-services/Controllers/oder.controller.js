@@ -131,7 +131,7 @@ const deleteAddressByUserId =async (req,res)=>{
 
 const getAmountsAndCountsForMonth = async (req, res) => {
     try {
-        const Amounts= await oderServices.getLastTenDaysOrdersCount();
+        const Amounts= await oderServices.getAllOrdersAmountQuantityGivenMonthToToday();
         res.status(200).json(Amounts);
     } catch (error) {
         res.status(500).json({ message: error.message });

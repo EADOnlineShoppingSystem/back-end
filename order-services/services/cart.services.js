@@ -28,4 +28,30 @@ const deleteCart = async (cartId)=>{
         throw new Error("error deleting cart")
     }
 }
-export default {addToCart,getCartByUserId,deleteCart}
+const updateCartQuantity = async (cartId, newQuantity) => {
+    try {
+
+        if (newQuantity < 0) {
+            throw new Error("Quantity cannot be negative");
+        }
+        const cartData = await cart.findById(cartId);
+        if (!cart) {
+            throw new Error("Cart not found");
+        }
+
+        cartData.quantity = newQuantity;
+        const updatedCart = await cartData.save();
+        return updatedCart;
+    } catch (error) {
+        throw new Error(`Error updating cart: ${error.message}`);
+    }
+};
+
+const findCartByUserIdAndProductId = async (userId, productId) => {
+    
+   const data = await cart.findOne({ userId, productId });
+   console.log("data ",data)
+    return data;
+};
+
+export default {addToCart,getCartByUserId,deleteCart,updateCartQuantity,findCartByUserIdAndProductId}
