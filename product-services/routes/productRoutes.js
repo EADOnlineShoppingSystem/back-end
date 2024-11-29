@@ -130,6 +130,7 @@ console.log(req.files);
 //Get all  Category
 router.get("/categories", async (req, res) => {
     try {
+      
       const categories = await Category.find();
       res.status(200).json({ categories });
     } catch (error) {
