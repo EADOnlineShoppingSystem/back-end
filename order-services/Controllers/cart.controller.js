@@ -69,4 +69,13 @@ const deleteCart = async (req,res)=>{
         res.status(500).json({message:error.message})
     }
 }
-export default {addToCart,getCartDetailsByUserID,deleteCart}
+const getAllQuantityByUsers = async (req,res)=>{
+    try {
+        const userId = req.user.id;
+        const cartData = await cartServices.getAllQuantityByUsers(userId);
+        res.status(200).json(cartData);
+    } catch (error) {
+        res.status(500).json({message:error.message})
+    }
+}
+export default {addToCart,getCartDetailsByUserID,deleteCart,getAllQuantityByUsers}
