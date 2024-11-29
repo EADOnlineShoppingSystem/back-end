@@ -37,7 +37,7 @@ router.post("/add-category", upload.single("image"), async (req, res) => {
 });
 
 
-// Delete category
+// Delete category and all associated products
 router.delete("/delete-category/:categoryId", async (req, res) => {
   const { categoryId } = req.params;
 
@@ -48,7 +48,10 @@ router.delete("/delete-category/:categoryId", async (req, res) => {
       return res.status(404).json({ message: "Category not found." });
     }
 
-    // Optionally, delete the image from Cloudinary if the category has an image
+    // Delete all products associated with this category
+    await Product.deleteMany({ categoryName: category.name });
+
+    // Optionally, delete the category image from Cloudinary if it exists
     if (category.image?.public_id) {
       console.log("Deleting image from Cloudinary...");
       await cloudinary.uploader.destroy(category.image.public_id);
@@ -57,7 +60,7 @@ router.delete("/delete-category/:categoryId", async (req, res) => {
     // Use `findByIdAndDelete` to delete the category
     await Category.findByIdAndDelete(categoryId);
 
-    res.status(200).json({ message: "Category deleted successfully." });
+    res.status(200).json({ message: "Category and all associated products deleted successfully." });
   } catch (error) {
     console.error("Error deleting category:", error);
     res.status(500).json({ message: "Server error." });
@@ -232,7 +235,6 @@ router.get("/all-products", async (req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 });
-
 
 
 // Update Product Details (only update provided fields)
