@@ -68,7 +68,6 @@ router.delete("/delete-category/:categoryId", async (req, res) => {
 });
 
 
-
 // Add a new product
 router.post("/add-product",upload.array("images", 10),  async (req, res) => {
 console.log(req.body);
@@ -119,7 +118,7 @@ console.log(req.files);
     res.status(500).json({ message: "Server error." });
   }
 });
-
+ 
 
 //Get all  Category
 router.get("/categories", async (req, res) => {
@@ -132,7 +131,6 @@ router.get("/categories", async (req, res) => {
     }
   });
   
-
 
 // Fetch Products by Category
 router.get("/getProducts/:categoryName", async (req, res) => {
