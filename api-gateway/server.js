@@ -37,9 +37,9 @@ app.use(
 );
 
 app.use(
-    "/auth",
+    "/User",
     createProxyMiddleware({
-        target: "http://localhost:5002",
+        target: "http://localhost:5000",
         changeOrigin: true,
          onError: (err, req, res) => {
         console.error('Order service proxy error:', err.message);
