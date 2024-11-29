@@ -11,5 +11,5 @@ const address = new Schema({
     isDefault:{type:Boolean,default:false},
     isProfessional:{type:Boolean,default:false}
 });
-
+ 
 export default model('Address', address);
