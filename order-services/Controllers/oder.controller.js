@@ -102,11 +102,12 @@ const createAddress =async (req,res)=>{
         res.status(500).json({message:error.message});
     }
 }
+//Get Addresss By User Id
 const getAddressById =async (req,res)=>{
     try{
         const userID = req.user.id;
-        console.log("userID",userID);
-        const address= await oderServices.getAddressById(userID)
+        const address= await oderServices.getAddressById(userID);
+        console.log("address",address);
         res.status(200).json(address);
 
     }catch(error){
@@ -114,4 +115,35 @@ const getAddressById =async (req,res)=>{
         res.status(500).json({message:error.message});
 }}
 
-export default { getAllOrders,createOders,getOdersByUserId,createAddress,getAddressById };
+const deleteAddressByUserId =async (req,res)=>{
+    try {
+        const addressId = req.params.addressId;
+        console.log("addressId",addressId);
+        const address = await oderServices.deleteAddressByUserId(addressId);
+        res.status(200).json(address);
+    } catch (error) {
+        res.status(500).json({message:error.message});
+        
+    }
+}
+////Admin Parts 
+
+
+const getAmountsAndCountsForMonth = async (req, res) => {
+    try {
+        const Amounts= await oderServices.getAllOrdersAmountQuantityGivenMonthToToday();
+        res.status(200).json(Amounts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const getOdersCountLast10Days = async (req, res) => {
+    try {
+        const Amounts= await oderServices.getLastTenDaysOrdersCount();
+        res.status(200).json(Amounts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+export default { getAllOrders,createOders,getOdersByUserId,createAddress,deleteAddressByUserId,getAddressById,getOdersCountLast10Days,getAmountsAndCountsForMonth };

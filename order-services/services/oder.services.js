@@ -46,6 +46,7 @@ const setAddress = async (userId, address) => {
     const getAddressById =async (userId)=>{
         try {
             const address = await Address.find({userId:userId});
+            console.log("address",address);
             return address;
 
         } catch (error) {
@@ -59,5 +60,95 @@ const setAddress = async (userId, address) => {
             throw new Error("Error while fetching address count");
         }
     }
+    const deleteAddressByUserId =async(AddressId)=>{
+        try {
+            return await Address.deleteOne({ _id: AddressId });
+        } catch (error) {
+            throw new Error("error deleting address")
+        }
+    }
+const getAllOrdersAmountQuantityGivenMonthToToday = async () => {
+    try {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); 
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59); 
+        
+        const orders = await Order.find({
+            createdAt: {
+                $gte: startOfMonth,
+                $lte: endOfToday,
+            },
+        });
+        // Calculate the total amount and quantity
+        const summary = orders.reduce(
+            (acc, order) => {
+                acc.totalAmount += order.price || 0; 
+                acc.totalQuantity += order.quantity || 0;
+                return acc;
+            },
+            { totalAmount: 0, totalQuantity: 0 }
+        );
 
-export default { getAllOrdersServices,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId }
+        console.log("Current Month:", now.getMonth() + 1);
+        console.log("Order Summary:", summary);
+
+        const allReturnData={
+            ...summary,
+            month: now.getMonth() + 1,
+        }
+        return allReturnData;
+    } catch (error) {
+        throw new Error(`Error calculating order summaries: ${error.message}`);
+    }
+};
+
+const getLastTenDaysOrdersCount = async () => {
+    try {
+        const now = new Date();
+        const lastTenDays = [];
+
+        // Loop through the last 10 days
+        for (let i = 0; i < 10; i++) {
+            const startOfDay = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - i,
+                0,
+                0,
+                0
+            );
+            const endOfDay = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - i,
+                23,
+                59,
+                59
+            );
+
+            // Fetch order count for the specific day
+            const orderCount = await Order.find({
+                createdAt: {
+                    $gte: startOfDay,
+                    $lte: endOfDay,
+                },
+            }).countDocuments();
+
+            // Add the data for the day to the results
+            lastTenDays.push({
+                day: `Day ${10 - i}`, 
+                date: startOfDay.toISOString().split('T')[0],
+                orders: orderCount,
+            });
+        }
+
+        return lastTenDays.reverse(); // Reverse to have Day 1 as the latest day
+    } catch (error) {
+        throw new Error(`Error fetching order counts: ${error.message}`);
+    }
+};
+
+
+
+
+export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,getAllOrdersAmountQuantityGivenMonthToToday ,getLastTenDaysOrdersCount}
