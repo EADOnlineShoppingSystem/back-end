@@ -16,4 +16,7 @@ router.get("/getAmountLastMonth",oderController.getAmountsAndCountsForMonth)
 //total oders count in last 10 days
 router.get("/getOdersCountLast10Days",oderController.getOdersCountLast10Days)
 router.put("/updateAddress",orderController.updateAddressByAddressId)
+router.get("/deleveryStatusTrue",authMiddleware,orderController.getDeliverystatusTrueSince1monthByuserId);
+router.put("/deleveryStatusTrue/:orderID",authMiddleware,orderController.deleverdStatusChangetoTrue);
+
 export default router;

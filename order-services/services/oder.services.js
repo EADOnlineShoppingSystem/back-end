@@ -31,6 +31,31 @@ const createMultipleOders = async (oders, userId) => {
         throw new Error("Error creating multiple orders");
     }
 }
+const getDeliverystatusTrueSince1monthByuserId = async () => {
+    try {
+        const now = new Date();
+        const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        const orders = await Order.find({
+            userId: userId,
+            deliveryStatus: true,
+            createdAt: { $gte: oneMonthAgo },
+        });
+        return orders;
+
+    } catch (error) {
+        throw new Error("Error fetching orders");
+    }
+}
+const deleverdStatusChangetoTrue = async (orderId) => {
+    try {
+        const updatedOrder = await Order.findByIdAndUpdate( orderId, { $set: { delevered: true } }, { new: true, runValidators: true });
+        return updatedOrder;
+} catch (error) {
+    throw new Error("Error updating order");
+}
+}
+
+
 const getOdersByUserId =async (userId)=>{
         try {
             const orders = await Order.find({ userId: userId });
@@ -185,4 +210,4 @@ const getLastTenDaysOrdersCount = async () => {
 
 
 
-export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,updateAddressByAddressId,getAllOrdersAmountQuantityGivenMonthToToday ,getLastTenDaysOrdersCount,createMultipleOders}
+export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,updateAddressByAddressId,getAllOrdersAmountQuantityGivenMonthToToday ,getLastTenDaysOrdersCount,createMultipleOders,getDeliverystatusTrueSince1monthByuserId,deleverdStatusChangetoTrue}
