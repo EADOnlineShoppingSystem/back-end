@@ -6,6 +6,10 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const axios = require("axios");
+const emailContent = require("../utils/emailContent");
+const generateEmailContent = require("../utils/generateEmailContent");
+
+
 // Email Transporter Configuration
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -17,14 +21,16 @@ let transporter = nodemailer.createTransport({
 
 // Reusable Email Sending Function
 const sendOtpEmail = async (email, otp) => {
+
+  const logoUrl = "https://res.cloudinary.com/dgbjkmftz/image/upload/v1732939603/uzdfvhcrkoalfnrglvoi.png"; // Cloudinary URL for logo
+  const shopName = "handsfreelk"; // Shop name
+  const emailHtml = generateEmailContent(otp, logoUrl, shopName);
+
   const mailOptions = {
-    from: "kanishkazoysa1234@gmail.com",
+    from: `"handsfree.lk" <kanishkazoysa1234@gmail.com>`,
     to: email,
     subject: "Email Verification OTP",
-    html: `
-      <p>Your OTP for verifying your email is: <strong>${otp}</strong>.</p>
-      <p>The OTP is valid for 10 minutes. If you did not request this, please ignore this email.</p>
-    `,
+    html: emailHtml
   };
 
   try {
@@ -153,10 +159,6 @@ router.post("/login", async (req, res) => {
 
   try {
     // Check if user exists'
-
-// const orderData = await axios.get("http://localhost:5001/api/orders/allOrders");
-// console.log("Order data:", orderData.data); 
-
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User does not exist." });
@@ -215,7 +217,7 @@ router.post("/forgot-password", async (req, res) => {
 
     // Send OTP via email
     const mailOptions = {
-      from: "kanishkazoysa1234@gmail.com",
+      from: `"handsfree.lk" <kanishkazoysa1234@gmail.com>`,
       to: email,
       subject: "Password Reset OTP",
       html: `<p>Your OTP for resetting your password is: <strong>${otp}</strong>.</p>
@@ -319,6 +321,42 @@ router.get("/getAllUsers", async (req , res) =>{
     res.status(500).json({ message: "Server error." });
   }
 })
+
+//remove users by id
+router.delete("/delete-user/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Send a confirmation email after deletion
+    const logoUrl = "https://res.cloudinary.com/dgbjkmftz/image/upload/v1732939603/uzdfvhcrkoalfnrglvoi.png"; // Cloudinary URL for logo
+    const shopName = "handsfree.lk"; // Shop name
+    const emailHtml = emailContent(shopName, logoUrl);
+
+    const mailOptions = {
+      from:`"handsfree.lk" <kanishkazoysa1234@gmail.com>`,
+      to: user.email,
+      subject: "Account Deletion Confirmation",
+      html: emailHtml,
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+
+    // Delete the user from the database
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "User deleted successfully. A confirmation email has been sent." });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
 
 
 
