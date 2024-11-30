@@ -329,7 +329,7 @@ router.get("/getAllUsers", async (req , res) =>{
 
 router.put("/update-profile/:userId", upload.single("image"), async (req, res) => {
   const { userId } = req.params;
-  const { username, address, phoneNumber } = req.body;
+  const { username, address, phoneNumber,bio } = req.body;
 
   try {
     // Find the user
@@ -351,6 +351,7 @@ router.put("/update-profile/:userId", upload.single("image"), async (req, res) =
     if (username) user.username = username;
     if (address) user.address = address;
     if (phoneNumber) user.phoneNumber = phoneNumber;
+    if (bio) user.bio = bio;
     user.imageUrl = imageUrl; // Update imageUrl with the Cloudinary URL
 
     // Save the updated user
@@ -362,6 +363,8 @@ router.put("/update-profile/:userId", upload.single("image"), async (req, res) =
     res.status(500).json({ message: "Server error." });
   }
 });
+
+
 
 
 module.exports = router;
