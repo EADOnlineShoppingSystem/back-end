@@ -6,7 +6,6 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const axios = require("axios");
-const emailContent = require("../utils/emailContent");
 const generateEmailContent = require("../utils/generateEmailContent");
 
 
@@ -324,41 +323,7 @@ router.get("/getAllUsers", async (req , res) =>{
   }
 })
 
-//remove users by id
-router.delete("/delete-user/:userId", async (req, res) => {
-  const { userId } = req.params;
 
-  try {
-    // Find the user by ID
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    // Send a confirmation email after deletion
-    const logoUrl = "https://res.cloudinary.com/dgbjkmftz/image/upload/v1732939603/uzdfvhcrkoalfnrglvoi.png"; // Cloudinary URL for logo
-    const shopName = "handsfree.lk"; // Shop name
-    const emailHtml = emailContent(shopName, logoUrl);
-
-    const mailOptions = {
-      from:`"handsfree.lk" <kanishkazoysa1234@gmail.com>`,
-      to: user.email,
-      subject: "Account Deletion Confirmation",
-      html: emailHtml,
-    };
-
-    // Send the email
-    await transporter.sendMail(mailOptions);
-
-    // Delete the user from the database
-    await User.findByIdAndDelete(userId);
-
-    res.status(200).json({ message: "User deleted successfully. A confirmation email has been sent." });
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ message: "Server error." });
-  }
-});
 
 
 
