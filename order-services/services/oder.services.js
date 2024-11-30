@@ -20,6 +20,17 @@ const createOder = async (oderData,userId)=>{
     }
 
 }
+const createMultipleOders = async (oders, userId) => {
+    try {
+        const newOders = oders.map((order) => ({
+            ...order,
+            userId,
+        }));
+        return await Order.insertMany(newOders);
+    } catch (error) {
+        throw new Error("Error creating multiple orders");
+    }
+}
 const getOdersByUserId =async (userId)=>{
         try {
             const orders = await Order.find({ userId: userId });
@@ -174,4 +185,4 @@ const getLastTenDaysOrdersCount = async () => {
 
 
 
-export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,updateAddressByAddressId,getAllOrdersAmountQuantityGivenMonthToToday ,getLastTenDaysOrdersCount}
+export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,updateAddressByAddressId,getAllOrdersAmountQuantityGivenMonthToToday ,getLastTenDaysOrdersCount,createMultipleOders}

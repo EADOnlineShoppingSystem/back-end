@@ -5,8 +5,8 @@ import authMiddleware from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.get("/allOrders", orderController.getAllOrders);
-router.post("/createOrder",authMiddleware,oderController.createOders);
-router.get("/getOdersByUserId/:userId",oderController.getOdersByUserId);
+router.post("/createOrder",authMiddleware,oderController.createOrders);
+router.get("/getOdersByUserId",authMiddleware,oderController.getOdersByUserId);
 router.post("/setAddress",authMiddleware,oderController.createAddress);
 router.get("/getAddressById",authMiddleware,oderController.getAddressById);
 //delete address by addressId
