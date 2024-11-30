@@ -67,6 +67,29 @@ const setAddress = async (userId, address) => {
             throw new Error("error deleting address")
         }
     }
+const updateAddressByAddressId = async (address) => {
+    try {
+        const { _id, ...addressData } = address;
+        if (!_id || Object.keys(addressData).length === 0) {
+            throw new Error("AddressId and address data are required");
+        }
+        console.log("addressData",address._id);
+        const updatedAddress = await Address.findByIdAndUpdate(
+            _id,
+            { $set: addressData },
+            { new: true, runValidators: true }
+        );
+        if (!updatedAddress) {
+            throw new Error("Address not found or update failed");
+        }
+        return updatedAddress;
+    } catch (error) {
+        console.error("Error updating address:", error.message);
+        throw new Error("Error updating address");
+    }
+};
+
+
 const getAllOrdersAmountQuantityGivenMonthToToday = async () => {
     try {
         const now = new Date();
@@ -151,4 +174,4 @@ const getLastTenDaysOrdersCount = async () => {
 
 
 
-export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,getAllOrdersAmountQuantityGivenMonthToToday ,getLastTenDaysOrdersCount}
+export default { getAllOrdersServices,deleteAddressByUserId,createOder,getOdersByUserId,setAddress,getAddressById,getAddressCountByUserId,updateAddressByAddressId,getAllOrdersAmountQuantityGivenMonthToToday ,getLastTenDaysOrdersCount}
