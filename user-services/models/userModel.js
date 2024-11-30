@@ -30,10 +30,19 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    address: {
+      type: String,
+      default: "",
+    },
+    phoneNumber: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
   }
 );
+
 const userModel = mongoose.model("users", userSchema);
 module.exports = userModel;
