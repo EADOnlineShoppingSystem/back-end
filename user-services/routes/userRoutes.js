@@ -338,10 +338,11 @@ router.put("/update-profile/:userId", upload.single("image"), async (req, res) =
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Handle image upload to Cloudinary
-    let imageUrl = user.imageUrl; // Default to the current image URL if no new image is uploaded
+    // Default imageUrl to current user image if no new image is uploaded
+    let imageUrl = user.imageUrl;
+
+    // Handle image upload to Cloudinary if an image is provided
     if (req.file) {
-      // Upload image to Cloudinary
       const result = await cloudinary.uploader.upload(req.file.path);
       imageUrl = result.secure_url; // Get the URL of the uploaded image
     }
@@ -355,18 +356,12 @@ router.put("/update-profile/:userId", upload.single("image"), async (req, res) =
     // Save the updated user
     await user.save();
 
-    console.log("Updated User:", user); // Log the updated user to verify
-
     res.status(200).json({ message: "Profile updated successfully.", user });
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({ message: "Server error." });
   }
 });
-
-
-
-
 
 
 module.exports = router;
