@@ -43,7 +43,7 @@ const sendOtpEmail = async (email, otp) => {
 
 // Register Route
 router.post("/register", async (req, res) => {
-  const {email, password } = req.body;
+  const {username,email, password} = req.body;
 
   try {
     // Check if user already exists
@@ -61,6 +61,7 @@ router.post("/register", async (req, res) => {
 
     // Save user as unverified
     const newUser = new User({
+      username,
       email,
       password: hashedPassword,
       isVerified: false,
