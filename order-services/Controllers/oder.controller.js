@@ -1,4 +1,5 @@
 import oderServices from "../services/oder.services.js";
+import cartServices from "../services/cart.services.js";
 import axios from "axios";
 
 //get All Orders 
@@ -42,22 +43,35 @@ const getAllOrders = async (req, res) => {
 };
 
 //create Oders
-const createOders =async (req,res)=>{
+const createOrders = async (req, res) => {
     try {
-        const oders = req.body;
-        const userID = req.user.id
-        const newOders = await oderServices.createOder(oders,userID);
-        res.status(201).json(newOders);
-        
+        const orders = req.body; 
+        const userID = req.user.id;
+
+        const newOrders = await oderServices.createMultipleOders(orders, userID);
+        const updatePromises = orders.map(async (order) => {
+            const productDetails = await axios.get(`http://localhost:3500/Product/api/products/product/${order.productId}`);
+            const reducedQuantity = productDetails.data.product.quantity - order.quantity;
+            const data={
+                quantity:reducedQuantity
+            }
+            const updatedProduct = await axios.put(`http://localhost:3500/Product/api/products/update-product/${order.productId}`, data);
+           
+            return updatedProduct;
+        });
+         await cartServices.deleteCartByUserId(userID);
+        await Promise.all(updatePromises);
+
+        res.status(201).json({ newOrders, message: "Orders created and quantities updated successfully" });
     } catch (error) {
-        res.status(500).json({message:error.message});
-        
+        res.status(500).json({ message: error.message });
     }
-}
+};
+
 //get Oders By User Id
 const getOdersByUserId = async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const userId = req.user.id;
         const oderData = await oderServices.getOdersByUserId(userId);
         const cleanedOderData = oderData.map(order => order.toObject());
 
@@ -155,4 +169,4 @@ const getOdersCountLast10Days = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
-export default { getAllOrders,createOders,getOdersByUserId,createAddress,deleteAddressByUserId,getAddressById,getOdersCountLast10Days,getAmountsAndCountsForMonth,updateAddressByAddressId};
+export default { getAllOrders,createOrders,getOdersByUserId,createAddress,deleteAddressByUserId,getAddressById,getOdersCountLast10Days,getAmountsAndCountsForMonth,updateAddressByAddressId};
