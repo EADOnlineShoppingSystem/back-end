@@ -18,7 +18,7 @@ let transporter = nodemailer.createTransport({
 // Reusable Email Sending Function
 const sendOtpEmail = async (email, otp) => {
   const mailOptions = {
-    from: "kanishkazoysa1234@gmail.com",
+    from: "kanishkazoysa123@gmail.com",
     to: email,
     subject: "Email Verification OTP",
     html: `
@@ -150,10 +150,8 @@ router.post("/resend-otp", async (req, res) => {
 //Login Rote
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     // Check if user exists'
-
 // const orderData = await axios.get("http://localhost:5001/api/orders/allOrders");
 // console.log("Order data:", orderData.data); 
 
