@@ -5,6 +5,7 @@ import cart from '../models/cart.js';
 const cartRouter = express.Router();
 
 cartRouter.get("/getCartsByuser",authMiddleware,cartController.getCartDetailsByUserID);
+cartRouter.delete("/CartsByuser",authMiddleware,cartController.deleteCartByUserId);
 cartRouter.post("/addtocart",authMiddleware,cartController.addToCart);
 cartRouter.delete("/deleteCart/:id",cartController.deleteCart);
 cartRouter.get("/getAllQuantityByUsers",authMiddleware,cartController.getAllQuantityByUsers);

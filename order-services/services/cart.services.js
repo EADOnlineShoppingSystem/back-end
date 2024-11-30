@@ -66,4 +66,11 @@ const getAllQuantityByUsers = async (userId) => {
     }
 }
 
-export default {addToCart,getCartByUserId,deleteCart,getAllQuantityByUsers,updateCartQuantity,findCartByUserIdAndProductId}
+const deleteCartByUserId = async (userId) => {
+    try {
+        return await cart.deleteMany({ userId });
+    } catch (error) {
+        throw new Error(`Error deleting cart by user: ${error.message}`);
+    }
+}
+export default {addToCart,getCartByUserId,deleteCart,getAllQuantityByUsers,updateCartQuantity,findCartByUserIdAndProductId,deleteCartByUserId}

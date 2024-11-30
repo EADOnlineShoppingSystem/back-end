@@ -1,4 +1,5 @@
 import oderServices from "../services/oder.services.js";
+import cartServices from "../services/cart.services.js";
 import axios from "axios";
 
 //get All Orders 
@@ -48,21 +49,17 @@ const createOrders = async (req, res) => {
         const userID = req.user.id;
 
         const newOrders = await oderServices.createMultipleOders(orders, userID);
-console.log("newOrders",newOrders);
-    
         const updatePromises = orders.map(async (order) => {
             const productDetails = await axios.get(`http://localhost:3500/Product/api/products/product/${order.productId}`);
-            console.log("productDetails",order.quantity);
             const reducedQuantity = productDetails.data.product.quantity - order.quantity;
-            console.log("reducedQuantity",reducedQuantity);
             const data={
                 quantity:reducedQuantity
             }
-            console.log("data",data);
             const updatedProduct = await axios.put(`http://localhost:3500/Product/api/products/update-product/${order.productId}`, data);
-            console.log("updatedProduct",updatedProduct);
+           
             return updatedProduct;
         });
+         await cartServices.deleteCartByUserId(userID);
         await Promise.all(updatePromises);
 
         res.status(201).json({ newOrders, message: "Orders created and quantities updated successfully" });
