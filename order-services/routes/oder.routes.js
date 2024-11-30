@@ -15,4 +15,5 @@ router.delete("/deleteAddress/:addressId",oderController.deleteAddressByUserId)
 router.get("/getAmountLastMonth",oderController.getAmountsAndCountsForMonth)
 //total oders count in last 10 days
 router.get("/getOdersCountLast10Days",oderController.getOdersCountLast10Days)
+router.put("/updateAddress",orderController.updateAddressByAddressId)
 export default router;
