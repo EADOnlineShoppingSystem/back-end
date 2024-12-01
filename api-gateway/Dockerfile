@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of the application code to the working directory
 COPY . .
 
+COPY .env .env
+
+
 # Expose the port that the API Gateway listens on
 EXPOSE 3500
 
