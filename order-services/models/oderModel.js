@@ -5,6 +5,8 @@ const orderSchema = new Schema({
     userId: { type: String, required: true },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
+    addressId: { type: String, required: true },
+    delevered: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now }
 });
 

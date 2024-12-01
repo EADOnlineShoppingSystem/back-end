@@ -116,6 +116,17 @@ const createAddress =async (req,res)=>{
         res.status(500).json({message:error.message});
     }
 }
+
+const getDeliverystatusTrueSince1monthByuserId = async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const orders = await oderServices.getDeliverystatusTrueSince1monthByuserId(userID);
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 //Get Addresss By User Id
 const getAddressById =async (req,res)=>{
     try{
@@ -169,4 +180,13 @@ const getOdersCountLast10Days = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
-export default { getAllOrders,createOrders,getOdersByUserId,createAddress,deleteAddressByUserId,getAddressById,getOdersCountLast10Days,getAmountsAndCountsForMonth,updateAddressByAddressId};
+const deleverdStatusChangetoTrue = async (req, res) => {
+    try {
+        const orderID = req.params.orderID;
+        const order = await oderServices.deleverdStatusChangetoTrue(orderID);
+        res.status(200).json(order);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+export default { getAllOrders,createOrders,getOdersByUserId,createAddress,deleteAddressByUserId,getAddressById,getOdersCountLast10Days,getAmountsAndCountsForMonth,updateAddressByAddressId,getDeliverystatusTrueSince1monthByuserId,deleverdStatusChangetoTrue};
