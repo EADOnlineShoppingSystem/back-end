@@ -37,6 +37,9 @@ services:
     environment:
       - MONGO_URI=mongodb+srv://priyadasunkc21:I9C1ryXvwKDaYRp6@users.c9fon.mongodb.net/?retryWrites=true&w=majority&appName=user
       - JWT_SECRET=kdm@#83jaKMDn22#3nvaCMq@!&mnskd832mvnaksd#
+      - CLOUDINARY_CLOUD_NAME=dgbjkmftz
+      - CLOUDINARY_API_KEY=857485585361998
+      - CLOUDINARY_API_SECRET=Tx-irm58gxZURFhlHJdhHYUBry8
 
   order-service:
     build:

@@ -19,6 +19,9 @@ EXPOSE 5000
 # Define environment variables for Cloudinary and MongoDB URI
 ENV MONGO_URI=mongodb+srv://priyadasunkc21:I9C1ryXvwKDaYRp6@users.c9fon.mongodb.net/?retryWrites=true&w=majority&appName=user
 ENV JWT_SECRET=kdm@#83jaKMDn22#3nvaCMq@!&mnskd832mvnaksd#
+ENV CLOUDINARY_CLOUD_NAME=dgbjkmftz
+ENV CLOUDINARY_API_KEY=857485585361998
+ENV CLOUDINARY_API_SECRET=Tx-irm58gxZURFhlHJdhHYUBry8
 
 
 # Command to run your app (npm run dev in your case)
